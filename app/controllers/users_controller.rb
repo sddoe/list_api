@@ -1,50 +1,65 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :update, :destroy]
 
-  # GET /users
   def index
     @users = User.all
 
-    render json: @users
+    respond_to do |format|
+      format.html
+      format.json { render :json => @users }
+    end
   end
 
-  # GET /users/1
+  def new
+    @user = User.new
+  end
+
   def show
-    render json: @user
+    @user = User.find(params[:id])
+
+
+    respond_to do |format|
+      format.html
+      format.json { render :json => @users }
+    end
   end
 
-  # POST /users
   def create
     @user = User.new(user_params)
 
     if @user.save
-      render json: @user, status: :created, location: @user
+      redirect_to @user, notice: 'User created successfully'
     else
-      render json: @user.errors, status: :unprocessable_entity
+      redirect_to new_user_path, alert: 'User creation failed'
     end
   end
 
-  # PATCH/PUT /users/1
+  def edit
+    @user = User.find(params[:id])
+  end
+
   def update
+    @user = User.find(params[:id])
     if @user.update(user_params)
-      render json: @user
+      redirect_to @user, notice 'User updated successfully'
     else
-      render json: @user.errors, status: :unprocessable_entity
+      redirect_to edit_user_path, alert 'User update failed'
     end
   end
 
-  # DELETE /users/1
   def destroy
+    @user = User.find(params[:id])
     @user.destroy
+
+    redirect_to root_path, notice 'User deleted'
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
+
     def set_user
       @user = User.find(params[:id])
     end
 
-    # Only allow a list of trusted parameters through.
     def user_params
       params.require(:user).permit(:name, :birth_date, :gender, :image_url)
     end
